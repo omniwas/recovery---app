@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f3460">
+    <meta name="background-color" content="#1a1a2e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JEN R-II">
+    <meta name="application-name" content="JEN R-II Recovery">
+    <meta name="description" content="JEN R-II Daily Recovery App - Multi-User, PIN Protected, Real-time Live">
+    <link rel="manifest" id="pwaManifestLink" href="manifest.json">
+    <link rel="icon" id="pwaFavicon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230f3460'/%3E%3Cstop offset='100%25' stop-color='%231a1a2e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='110' fill='url(%23bg)' stroke='%2300d9ff' stroke-width='16'/%3E%3Ctext x='256' y='215' font-family='sans-serif' font-size='120' font-weight='900' fill='%2300d9ff' text-anchor='middle'%3E%E2%82%B9%3C/text%3E%3Ctext x='256' y='325' font-family='sans-serif' font-size='68' font-weight='800' fill='%232ed573' text-anchor='middle'%3EJEN R-II%3C/text%3E%3Ctext x='256' y='405' font-family='sans-serif' font-size='44' font-weight='600' fill='%23ffa502' text-anchor='middle'%3ERECOVERY%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" id="pwaAppleIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%230f3460'/%3E%3Ctext x='256' y='215' font-family='sans-serif' font-size='120' font-weight='900' fill='%2300d9ff' text-anchor='middle'%3E%E2%82%B9%3C/text%3E%3Ctext x='256' y='325' font-family='sans-serif' font-size='68' font-weight='800' fill='%232ed573' text-anchor='middle'%3EJEN R-II%3C/text%3E%3Ctext x='256' y='405' font-family='sans-serif' font-size='44' font-weight='600' fill='%23ffa502' text-anchor='middle'%3ERECOVERY%3C/text%3E%3C/svg%3E">
+    <title>JEN R-II Daily Recovery App</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh; color: #e0e0e0; padding: 12px;
+        }
+        .container { max-width: 920px; margin: 0 auto; }
+        .header { text-align: center; padding: 18px 10px; margin-bottom: 16px; }
+        .header h1 { font-size: 1.55rem; color: #00d9ff; margin-bottom: 5px; }
+        .header p { color: #a0a0a0; font-size: 0.88rem; }
+        .role-select { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .role-btn {
+            background: #1f4068; border: 2px solid #00d9ff; color: #00d9ff;
+            padding: 14px 26px; border-radius: 12px; font-size: 1.02rem; font-weight: 600;
+            cursor: pointer; transition: all 0.25s; min-width: 145px;
+        }
+        .role-btn:hover, .role-btn.active {
+            background: #00d9ff; color: #0f3460; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.3);
+        }
+        .card {
+            background: rgba(31, 64, 104, 0.72); border-radius: 16px; padding: 18px;
+            margin-bottom: 14px; border: 1px solid rgba(0, 217, 255, 0.15); backdrop-filter: blur(10px);
+        }
+        .card h2 { color: #00d9ff; font-size: 1.15rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #b0b0b0; font-size: 0.88rem; }
+        select, input[type="date"], input[type="number"], input[type="text"], input[type="password"] {
+            width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #2a4a7a;
+            background: #0f1c2e; color: #e0e0e0; font-size: 1rem; outline: none; transition: border 0.2s;
+        }
+        select:focus, input:focus { border-color: #00d9ff; }
+        .btn {
+            background: linear-gradient(135deg, #00d9ff, #0099cc); color: #0f3460; border: none;
+            padding: 13px 22px; border-radius: 10px; font-size: 1.02rem; font-weight: 700;
+            cursor: pointer; width: 100%; transition: all 0.25s; margin-top: 6px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 217, 255, 0.35); }
+        .btn-secondary { background: transparent; border: 2px solid #00d9ff; color: #00d9ff; }
+        .btn-secondary:hover { background: rgba(0, 217, 255, 0.15); }
+        .btn-danger { background: linear-gradient(135deg, #ff4757, #c0392b); color: white; }
+        .btn-success { background: linear-gradient(135deg, #2ed573, #1e9b4e); color: white; }
+        .btn-sm { padding: 9px 14px; font-size: 0.88rem; width: auto; }
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .btn-row .btn { flex: 1; min-width: 120px; }
+        .date-list { display: flex; flex-direction: column; gap: 9px; }
+        .date-item {
+            background: #0f1c2e; border-radius: 12px; padding: 13px 15px; cursor: pointer;
+            border: 1px solid #2a4a7a; transition: all 0.2s; display: flex;
+            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+        }
+        .date-item:hover { border-color: #00d9ff; background: #152238; }
+        .date-item.has-data { border-left: 4px solid #00d9ff; }
+        .date-label { font-weight: 600; font-size: 1.02rem; color: #e0e0e0; }
+        .date-totals { display: flex; gap: 14px; font-size: 0.92rem; }
+        .total-cash { color: #2ed573; }
+        .total-dc { color: #ffa502; }
+        .detail-view { display: none; }
+        .detail-view.active { display: block; }
+        .employee-row {
+            display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 8px;
+            padding: 11px 10px; border-bottom: 1px solid #2a4a7a; align-items: center; font-size: 0.93rem;
+        }
+        .employee-row.header {
+            background: #1a2a4a; border-radius: 8px 8px 0 0; font-weight: 700;
+            color: #00d9ff; border-bottom: 2px solid #00d9ff;
+        }
+        .employee-row:last-child { border-bottom: none; }
+        .cash-val { color: #2ed573; font-weight: 600; }
+        .dc-val { color: #ffa502; font-weight: 600; }
+        .zero { color: #555; }
+        .back-btn { margin-bottom: 14px; width: auto; padding: 9px 18px; }
+        .summary-bar {
+            background: #0f1c2e; border-radius: 12px; padding: 14px; margin-bottom: 14px;
+            display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; border: 1px solid #2a4a7a;
+        }
+        .summary-item { text-align: center; }
+        .summary-item .label { font-size: 0.78rem; color: #a0a0a0; margin-bottom: 3px; }
+        .summary-item .value { font-size: 1.25rem; font-weight: 700; }
+        .value.cash { color: #2ed573; }
+        .value.dc { color: #ffa502; }
+        .value.total { color: #00d9ff; }
+        .msg { padding: 11px 14px; border-radius: 10px; margin-bottom: 14px; font-weight: 500; display: none; }
+        .msg.success { background: rgba(46, 213, 115, 0.15); border: 1px solid #2ed573; color: #2ed573; display: block; }
+        .msg.error { background: rgba(255, 71, 87, 0.15); border: 1px solid #ff4757; color: #ff4757; display: block; }
+        .msg.info { background: rgba(0, 217, 255, 0.12); border: 1px solid #00d9ff; color: #00d9ff; display: block; }
+        .empty-state { text-align: center; padding: 36px 18px; color: #666; }
+        .logout-btn {
+            position: fixed; top: 10px; right: 10px; background: rgba(255,71,87,0.2);
+            border: 1px solid #ff4757; color: #ff4757; padding: 7px 12px; border-radius: 8px;
+            font-size: 0.82rem; cursor: pointer; z-index: 100;
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        .employee-select-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 9px; margin-bottom: 14px;
+        }
+        .emp-chip {
+            background: #0f1c2e; border: 1px solid #2a4a7a; padding: 11px 7px; border-radius: 10px;
+            text-align: center; cursor: pointer; font-size: 0.87rem; transition: all 0.2s;
+        }
+        .emp-chip:hover, .emp-chip.selected {
+            border-color: #00d9ff; background: rgba(0, 217, 255, 0.15); color: #00d9ff;
+        }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .footer-note { text-align: center; margin-top: 24px; padding: 14px; color: #555; font-size: 0.78rem; }
+        .password-box { max-width: 340px; margin: 0 auto; }
+        .tools-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .status-bar {
+            text-align: center; padding: 8px; margin-bottom: 12px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 600;
+        }
+        .status-online { background: rgba(46, 213, 115, 0.15); color: #2ed573; border: 1px solid #2ed573; }
+        .status-offline { background: rgba(255, 71, 87, 0.15); color: #ff4757; border: 1px solid #ff4757; }
+        .status-loading { background: rgba(0, 217, 255, 0.12); color: #00d9ff; border: 1px solid #00d9ff; }
+        .config-warning {
+            background: rgba(255, 165, 2, 0.15); border: 1px solid #ffa502; color: #ffa502;
+            padding: 14px; border-radius: 12px; margin-bottom: 16px; font-size: 0.9rem; text-align: center;
+        }
+        .logged-in-badge {
+            background: rgba(46, 213, 115, 0.2); border: 1px solid #2ed573; color: #2ed573;
+            padding: 10px 14px; border-radius: 10px; text-align: center; margin-bottom: 14px;
+            font-weight: 600; font-size: 0.95rem;
+        }
+        .pin-display {
+            letter-spacing: 8px; font-size: 1.4rem; text-align: center; font-weight: 700;
+        }
+        @media (max-width: 500px) {
+            .employee-row { grid-template-columns: 1.2fr 0.9fr 0.9fr; font-size: 0.82rem; padding: 9px 5px; }
+            .date-totals { gap: 9px; font-size: 0.82rem; }
+            .header h1 { font-size: 1.3rem; }
+            .btn-row .btn { min-width: 100%; }
+        }
+        .badge {
+            display: inline-block; background: #00d9ff; color: #0f3460; font-size: 0.7rem;
+            padding: 2px 7px; border-radius: 20px; font-weight: 700; margin-left: 6px;
+        }
+        .pwa-banner {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.16), rgba(46, 213, 115, 0.14));
+            border: 1px solid rgba(0, 217, 255, 0.45); border-radius: 14px; padding: 12px 15px;
+            margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; flex-wrap: wrap;
+        }
+        .pwa-banner-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; }
+        .pwa-icon-box {
+            width: 42px; height: 42px; border-radius: 10px; background: #0f3460;
+            border: 2px solid #00d9ff; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; color: #00d9ff; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .pwa-banner-text h3 { font-size: 0.95rem; color: #00d9ff; margin-bottom: 2px; }
+        .pwa-banner-text p { font-size: 0.78rem; color: #c0d0e0; }
+        .pwa-banner-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .pwa-btn {
+            background: #00d9ff; color: #0f3460; border: none; padding: 8px 14px;
+            border-radius: 9px; font-size: 0.84rem; font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pwa-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,217,255,0.3); }
+        .pwa-btn-outline {
+            background: rgba(15, 28, 46, 0.7); color: #00d9ff; border: 1px solid #00d9ff;
+            padding: 8px 12px; border-radius: 9px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+        }
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(10, 15, 28, 0.82);
+            backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center;
+            z-index: 999; padding: 14px; overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: #162440; border: 1px solid #00d9ff; border-radius: 16px;
+            max-width: 540px; width: 100%; padding: 20px; color: #e0e0e0;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6); max-height: 90vh; overflow-y: auto;
+        }
+        .modal-card h3 { color: #00d9ff; font-size: 1.15rem; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close {
+            background: transparent; border: 1px solid #ff4757; color: #ff4757;
+            border-radius: 8px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer;
+        }
+        .step-box {
+            background: #0f1c2e; border: 1px solid #2a4a7a; border-left: 4px solid #00d9ff;
+            border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 0.86rem; line-height: 1.5;
+        }
+        .step-box b { color: #00d9ff; }
+        .step-box code {
+            background: #1a2a4a; color: #2ed573; padding: 2px 6px; border-radius: 5px;
+            font-family: monospace; font-size: 0.82rem;
+        }
+        .standalone-badge {
+            display: none; background: rgba(46, 213, 115, 0.15); border: 1px solid #2ed573;
+            color: #2ed573; padding: 6px 12px; border-radius: 20px; font-size: 0.78rem;
+            font-weight: 600; margin: 8px auto 0; width: fit-content;
+        }
+    </style>
+</head>
+<body>
+    <button class="logout-btn" id="logoutBtn" style="display:none;" onclick="logout()">Logout</button>
+
+    <div class="container">
+        <!-- CONFIG WARNING -->
+        <div class="config-warning" id="configWarning">
+            ⚠️ Firebase connection check kar rahe hain...
+        </div>
+
+        <!-- PWA INSTALL & HTTP HOME SCREEN BANNER -->
+        <div class="pwa-banner" id="pwaInstallBanner">
+            <div class="pwa-banner-info">
+                <div class="pwa-icon-box">₹</div>
+                <div class="pwa-banner-text">
+                    <h3>📲 Mobile Home Screen App</h3>
+                    <p id="pwaBannerSubtext">Chrome ke jariye Home Screen par full-screen app ki tarah lagayein</p>
+                </div>
+            </div>
+            <div class="pwa-banner-actions">
+                <button class="pwa-btn" id="installAppBtn" onclick="installPWA()">📲 Add to Home Screen</button>
+                <button class="pwa-btn-outline" onclick="openPwaGuide()">❓ HTTP / Setup Guide</button>
+            </div>
+        </div>
+
+        <!-- ROLE SELECTION -->
+        <div class="section active" id="roleSection">
+            <div class="header">
+                <h1>📊 JEN R-II Daily Recovery</h1>
+                <p>Multi-User • PIN Protected • Real-time Live</p>
+                <div class="standalone-badge" id="standaloneBadge">✅ Running as Home Screen App</div>
+            </div>
+            <div id="connectionStatus" class="status-bar status-loading">Connecting...</div>
+            <div class="role-select">
+                <button class="role-btn" onclick="showAdminLogin()">👨‍💼 Admin / Owner</button>
+                <button class="role-btn" onclick="showEmployeeLogin()">👷 Employee</button>
+            </div>
+        </div>
+
+        <!-- ADMIN LOGIN -->
+        <div class="section" id="adminLoginSection">
+            <div class="header">
+                <h1>🔐 Admin Login</h1>
+            </div>
+            <div class="card password-box">
+                <div id="loginMsg"></div>
+                <div class="form-group">
+                    <label>Admin Password</label>
+                    <input type="password" id="adminPassword" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminPassword()">
+                </div>
+                <button class="btn" onclick="checkAdminPassword()">Login</button>
+                <button class="btn btn-secondary" style="margin-top:10px;" onclick="backToRole()">← Back</button>
+                <p style="margin-top:14px; font-size:0.8rem; color:#888; text-align:center;">
+                    Default password: <b style="color:#00d9ff;">admin123</b>
+                </p>
+            </div>
+        </div>
+
+        <!-- EMPLOYEE LOGIN (Name + PIN) -->
+        <div class="section" id="employeeLoginSection">
+            <div class="header">
+                <h1>👷 Employee Login</h1>
+                <p>Apna naam select karke PIN daalein</p>
+            </div>
+            <div class="card">
+                <div id="empLoginMsg"></div>
+                <h2>👤 Apna Naam Select Karein</h2>
+                <div class="employee-select-grid" id="empLoginGrid"></div>
+            </div>
+            <div class="card" id="pinCard" style="display:none;">
+                <h2>🔑 PIN Enter Karein — <span id="pinEmpName"></span></h2>
+                <div class="form-group">
+                    <label>4-digit PIN</label>
+                    <input type="password" id="empPin" class="pin-display" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')checkEmployeePin()">
+                </div>
+                <button class="btn" onclick="checkEmployeePin()">Login</button>
+                <button class="btn btn-secondary" style="margin-top:10px;" onclick="backToEmpSelect()">← Naam Change</button>
+            </div>
+            <button class="btn btn-secondary" style="margin-top:10px;" onclick="backToRole()">← Back to Home</button>
+        </div>
+
+        <!-- EMPLOYEE SECTION (After Login) -->
+        <div class="section" id="employeeSection">
+            <div class="header">
+                <h1>👷 Employee Entry</h1>
+                <p>Sirf aapka data</p>
+            </div>
+            <div id="empStatus" class="status-bar status-loading">Connecting...</div>
+
+            <div class="logged-in-badge" id="loggedInBadge">
+                ✅ Logged in as: <span id="loggedEmpName"></span>
+            </div>
+
+            <div class="card" id="entryFormCard">
+                <h2>📝 Aaj ka Recovery Data</h2>
+                <div id="msgBox"></div>
+                
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="entryDate">
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label>Cash Amount (₹)</label>
+                        <input type="number" id="cashAmount" placeholder="0" min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>DC Amount (₹)</label>
+                        <input type="number" id="dcAmount" placeholder="0" min="0" step="1">
+                    </div>
+                </div>
+
+                <button class="btn" id="submitBtn" onclick="submitEntry()">✅ Submit Recovery</button>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" onclick="showMyHistory()">📜 Mera History</button>
+                </div>
+            </div>
+
+            <div class="card" id="myHistoryCard" style="display:none;">
+                <h2>📜 Mera Recovery History</h2>
+                <button class="btn btn-secondary back-btn" onclick="hideMyHistory()">← Back</button>
+                <div id="myHistoryList"></div>
+            </div>
+        </div>
+
+        <!-- ADMIN SECTION -->
+        <div class="section" id="adminSection">
+            <div class="header">
+                <h1>👨‍💼 Admin Dashboard</h1>
+                <p>Live • Date-wise recovery</p>
+            </div>
+            <div id="adminStatus" class="status-bar status-loading">Connecting...</div>
+
+            <div id="adminMsgBox"></div>
+            <div class="tools-bar">
+                <button class="btn btn-sm btn-success" onclick="exportCSV()">📊 Export Excel</button>
+                <button class="btn btn-sm btn-danger" onclick="clearAllData()">🗑️ Clear All</button>
+            </div>
+
+            <div class="summary-bar" id="overallSummary">
+                <div class="summary-item">
+                    <div class="label">Total Cash</div>
+                    <div class="value cash" id="overallCash">₹0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">Total DC</div>
+                    <div class="value dc" id="overallDC">₹0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">Grand Total</div>
+                    <div class="value total" id="overallTotal">₹0</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📅 Date-wise Recovery <span class="badge" id="dateCount">0</span></h2>
+                <div class="date-list" id="dateList"></div>
+            </div>
+
+            <div class="card detail-view" id="detailView">
+                <button class="btn btn-secondary back-btn" onclick="closeDetail()">← Back to Dates</button>
+                <h2 id="detailTitle">Details</h2>
+                <div class="summary-bar" style="margin-top:10px;">
+                    <div class="summary-item">
+                        <div class="label">Cash</div>
+                        <div class="value cash" id="detailCash">₹0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="label">DC</div>
+                        <div class="value dc" id="detailDC">₹0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="label">Total</div>
+                        <div class="value total" id="detailTotal">₹0</div>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <div class="employee-row header">
+                        <div>Employee</div>
+                        <div>Cash</div>
+                        <div>DC</div>
+                    </div>
+                    <div id="detailRows"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        JEN R-II Recovery System • Real-time • PIN Protected • Powered by Firebase
+    </div>
+
+    <!-- PWA & HTTP HOME SCREEN GUIDE MODAL -->
+    <div class="modal-overlay" id="pwaGuideModal">
+        <div class="modal-card">
+            <h3>
+                <span>📲 Chrome Home Screen & HTTP Setup</span>
+                <button class="modal-close" onclick="closePwaGuide()">✕ Close</button>
+            </h3>
+            <div id="pwaModalStatusMsg"></div>
+            <div class="step-box">
+                <b>Step 1: Online HTTPS ya Local HTTP par Chalayein</b><br>
+                Chrome me <i>Add to Home screen</i> tabhi kaam karta hai jab file <code>https://</code> ya <code>http://</code> link se khuli ho (sidha <code>file:///</code> se nahi):
+                <ul style="margin:6px 0 0 18px;">
+                    <li><b>Sabse Aasan (Free Live Link):</b> Diye gaye <b>jen-r2-recovery-pwa.zip</b> (ya is file ko <code>index.html</code> naam dekar) <b>app.netlify.com/drop</b> par drag-and-drop karein. Turant permanent link mil jayega.</li>
+                    <li><b>Local Wi-Fi HTTP Server (PC/Termux):</b> Jis folder me file hai wahan <code>python -m http.server 8080</code> chalayein aur mobile Chrome me <code>http://localhost:8080</code> ya PC ka IP kholein.</li>
+                </ul>
+            </div>
+            <div class="step-box">
+                <b>Step 2: Mobile Chrome se Home Screen par Layein</b><br>
+                1. Mobile ke <b>Google Chrome</b> me apna link kholein.<br>
+                2. Upar <b>📲 Add to Home Screen</b> button dabayein, ya Chrome ke upar right corner me <b>3 dots (⋮)</b> par tap karein.<br>
+                3. <b>Install app</b> ya <b>Add to Home screen</b> select karke <b>Add / Install</b> dabayein.<br>
+                4. Ab aapke mobile ki Home Screen par <b>JEN R-II Recovery</b> ka icon aa jayega aur bina browser address bar ke full-screen khulega!
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-sm btn-success" onclick="downloadPwaHelperFiles()">📦 Download manifest.json + sw.js</button>
+                <button class="btn btn-sm btn-secondary" onclick="closePwaGuide()">Samajh Gaya</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLEAR ALL DATA CONFIRMATION MODAL (replaces blocked confirm/alert) -->
+    <div class="modal-overlay" id="clearConfirmModal">
+        <div class="modal-card" style="max-width:400px;">
+            <h3>
+                <span style="color:#ff4757;">⚠️ Clear All Recovery Data?</span>
+                <button class="modal-close" onclick="closeClearConfirmModal()">✕</button>
+            </h3>
+            <p style="font-size:0.92rem; color:#d0d0d0; margin-bottom:14px; line-height:1.5;" id="clearConfirmText">
+                Saara recovery data Firebase se permanent delete ho jayega. Kya aap sach me delete karna chahte hain?
+            </p>
+            <div class="btn-row">
+                <button class="btn btn-sm btn-danger" id="confirmDeleteStepBtn" onclick="proceedClearAllData()">🗑️ Haan, Delete Karein</button>
+                <button class="btn btn-sm btn-secondary" onclick="closeClearConfirmModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG — YAHAN APNA CONFIG PASTE KARO
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1rUbJcB_-T-vE1brRHvOhgVuZhVsxHuU",
+            authDomain: "recoveryapp-36d3b.firebaseapp.com",
+            databaseURL: "https://recoveryapp-36d3b-default-rtdb.firebaseio.com",
+            projectId: "recoveryapp-36d3b",
+            storageBucket: "recoveryapp-36d3b.firebasestorage.app",
+            messagingSenderId: "751754368743",
+            appId: "1:751754368743:web:5426c99391c8187fc03442"
+        };
+        // ============================================================
+
+        // ========== EMPLOYEE LIST + PIN ==========
+        // Har employee ka alag 4-digit PIN
+        // Aap ye PINs change kar sakte ho
+        const EMPLOYEE_PINS = {
+            "MANOHRI":    "1111",
+            "SUNEEL":     "2222",
+            "KARMVEER":   "3333",
+            "MANOJ":      "4444",
+            "OM PRAKASH": "5555",
+            "KAPTAN":     "6666",
+            "SUBHAS":     "7777",
+            "RAKESH":     "8888",
+            "DAYARAM":    "9999",
+            "PRAVESH":    "1010",
+            "PANKAJ":     "1212",
+            "DILEEP":     "1313",
+            "RAMSWAROOP": "1414",
+            "SONVEER":    "1515",
+            "VISHVENDRA": "1616",
+            "VEDPRAKASH": "1717"
+        };
+
+        const EMPLOYEES = Object.keys(EMPLOYEE_PINS);
+        const ADMIN_PASSWORD = "admin123";
+
+        // State
+        let db = null;
+        let currentRole = null;
+        let selectedEmployee = null;   // logged-in employee
+        let pendingEmpName = null;     // selected during login
+        let allData = {};
+        let isConnected = false;
+
+        // Init Firebase
+        function initFirebase() {
+            if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+                document.getElementById('configWarning').style.display = 'block';
+                setStatus('connectionStatus', 'offline', '⚠️ Firebase config set nahi hua');
+                setStatus('empStatus', 'offline', '⚠️ Firebase config set nahi hua');
+                setStatus('adminStatus', 'offline', '⚠️ Firebase config set nahi hua');
+                return false;
+            }
+
+            document.getElementById('configWarning').style.display = 'none';
+
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                
+                db.ref('.info/connected').on('value', (snap) => {
+                    isConnected = snap.val() === true;
+                    const status = isConnected ? 'online' : 'offline';
+                    const text = isConnected ? '🟢 Connected (Live)' : '🔴 Offline';
+                    setStatus('connectionStatus', status, text);
+                    setStatus('empStatus', status, text);
+                    setStatus('adminStatus', status, text);
+                });
+
+                db.ref('recovery').on('value', (snapshot) => {
+                    allData = snapshot.val() || {};
+                    if (currentRole === 'admin') {
+                        renderAdminDashboard();
+                    }
+                    if (currentRole === 'employee' && document.getElementById('myHistoryCard').style.display !== 'none') {
+                        showMyHistory();
+                    }
+                });
+
+                return true;
+            } catch (err) {
+                console.error(err);
+                setStatus('connectionStatus', 'offline', '❌ Connection failed');
+                return false;
+            }
+        }
+
+        function setStatus(id, type, text) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.className = 'status-bar status-' + type;
+            el.textContent = text;
+        }
+
+        // ========== INIT ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            document.getElementById('entryDate').value = today.toISOString().slice(0, 10);
+            renderEmpLoginGrid();
+            initPWA();
+            initFirebase();
+        });
+
+        // ========== ROLE ==========
+        function showAdminLogin() {
+            document.getElementById('roleSection').classList.remove('active');
+            document.getElementById('adminLoginSection').classList.add('active');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginMsg').innerHTML = '';
+            setTimeout(() => document.getElementById('adminPassword').focus(), 100);
+        }
+
+        function showEmployeeLogin() {
+            document.getElementById('roleSection').classList.remove('active');
+            document.getElementById('employeeLoginSection').classList.add('active');
+            document.getElementById('pinCard').style.display = 'none';
+            document.getElementById('empLoginMsg').innerHTML = '';
+            pendingEmpName = null;
+            document.querySelectorAll('#empLoginGrid .emp-chip').forEach(c => c.classList.remove('selected'));
+        }
+
+        function checkAdminPassword() {
+            const pwd = document.getElementById('adminPassword').value;
+            if (pwd === ADMIN_PASSWORD) {
+                document.getElementById('adminLoginSection').classList.remove('active');
+                selectRole('admin');
+            } else {
+                document.getElementById('loginMsg').innerHTML = '<div class="msg error">Galat password!</div>';
+            }
+        }
+
+        function backToRole() {
+            document.getElementById('adminLoginSection').classList.remove('active');
+            document.getElementById('employeeLoginSection').classList.remove('active');
+            document.getElementById('roleSection').classList.add('active');
+        }
+
+        function selectRole(role) {
+            currentRole = role;
+            document.getElementById('roleSection').classList.remove('active');
+            document.getElementById('logoutBtn').style.display = 'block';
+
+            if (role === 'admin') {
+                document.getElementById('adminSection').classList.add('active');
+                document.getElementById('employeeSection').classList.remove('active');
+                renderAdminDashboard();
+            } else {
+                document.getElementById('employeeSection').classList.add('active');
+                document.getElementById('adminSection').classList.remove('active');
+                document.getElementById('loggedEmpName').textContent = selectedEmployee;
+            }
+        }
+
+        function logout() {
+            currentRole = null;
+            selectedEmployee = null;
+            pendingEmpName = null;
+            document.getElementById('roleSection').classList.add('active');
+            document.getElementById('adminSection').classList.remove('active');
+            document.getElementById('employeeSection').classList.remove('active');
+            document.getElementById('adminLoginSection').classList.remove('active');
+            document.getElementById('employeeLoginSection').classList.remove('active');
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('myHistoryCard').style.display = 'none';
+            document.getElementById('entryFormCard').style.display = 'block';
+        }
+
+        // ========== EMPLOYEE LOGIN ==========
+        function renderEmpLoginGrid() {
+            const grid = document.getElementById('empLoginGrid');
+            grid.innerHTML = EMPLOYEES.map(name => 
+                `<div class="emp-chip" onclick="selectEmpForLogin('${name}')">${name}</div>`
+            ).join('');
+        }
+
+        function selectEmpForLogin(name) {
+            pendingEmpName = name;
+            document.querySelectorAll('#empLoginGrid .emp-chip').forEach(c => {
+                c.classList.toggle('selected', c.textContent === name);
+            });
+            document.getElementById('pinEmpName').textContent = name;
+            document.getElementById('pinCard').style.display = 'block';
+            document.getElementById('empPin').value = '';
+            document.getElementById('empLoginMsg').innerHTML = '';
+            setTimeout(() => document.getElementById('empPin').focus(), 100);
+        }
+
+        function backToEmpSelect() {
+            document.getElementById('pinCard').style.display = 'none';
+            pendingEmpName = null;
+            document.querySelectorAll('#empLoginGrid .emp-chip').forEach(c => c.classList.remove('selected'));
+        }
+
+        function checkEmployeePin() {
+            if (!pendingEmpName) {
+                document.getElementById('empLoginMsg').innerHTML = '<div class="msg error">Pehle naam select karein</div>';
+                return;
+            }
+            const pin = document.getElementById('empPin').value.trim();
+            if (pin === EMPLOYEE_PINS[pendingEmpName]) {
+                selectedEmployee = pendingEmpName;
+                document.getElementById('employeeLoginSection').classList.remove('active');
+                selectRole('employee');
+            } else {
+                document.getElementById('empLoginMsg').innerHTML = '<div class="msg error">Galat PIN! Sirf apna PIN daalein.</div>';
+                document.getElementById('empPin').value = '';
+            }
+        }
+
+        // ========== EMPLOYEE DATA ==========
+        function submitEntry() {
+            if (!selectedEmployee) {
+                showMsg('Login nahi hua', 'error');
+                return;
+            }
+            if (!db || !isConnected) {
+                showMsg('Internet / Firebase connection nahi hai', 'error');
+                return;
+            }
+
+            const date = document.getElementById('entryDate').value;
+            if (!date) {
+                showMsg('Date select karein', 'error');
+                return;
+            }
+            const cash = parseFloat(document.getElementById('cashAmount').value) || 0;
+            const dc = parseFloat(document.getElementById('dcAmount').value) || 0;
+
+            if (cash === 0 && dc === 0) {
+                showMsg('Kam se kam Cash ya DC amount dalen', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            // Sirf apna data save hoga
+            db.ref('recovery/' + date + '/' + selectedEmployee).set({
+                cash: cash,
+                dc: dc,
+                updatedAt: new Date().toISOString()
+            }).then(() => {
+                showMsg(`✅ Aapka data LIVE save ho gaya!<br>Cash: ₹${cash.toLocaleString('en-IN')} | DC: ₹${dc.toLocaleString('en-IN')}`, 'success');
+                document.getElementById('cashAmount').value = '';
+                document.getElementById('dcAmount').value = '';
+            }).catch(err => {
+                showMsg('Error: ' + err.message, 'error');
+            }).finally(() => {
+                btn.disabled = false;
+                btn.textContent = '✅ Submit Recovery';
+            });
+        }
+
+        function showMsg(text, type) {
+            const box = document.getElementById('msgBox');
+            box.innerHTML = `<div class="msg ${type}">${text}</div>`;
+            setTimeout(() => { box.innerHTML = ''; }, 4500);
+        }
+
+        function showMyHistory() {
+            if (!selectedEmployee) return;
+            document.getElementById('entryFormCard').style.display = 'none';
+            document.getElementById('myHistoryCard').style.display = 'block';
+
+            const dates = Object.keys(allData).sort().reverse();
+            let html = '';
+            let hasData = false;
+
+            dates.forEach(date => {
+                if (allData[date] && allData[date][selectedEmployee]) {
+                    hasData = true;
+                    const e = allData[date][selectedEmployee];
+                    html += `
+                        <div class="date-item has-data">
+                            <div class="date-label">${formatDate(date)}</div>
+                            <div class="date-totals">
+                                <span class="total-cash">Cash: ₹${(e.cash||0).toLocaleString('en-IN')}</span>
+                                <span class="total-dc">DC: ₹${(e.dc||0).toLocaleString('en-IN')}</span>
+                            </div>
+                        </div>`;
+                }
+            });
+
+            if (!hasData) html = `<div class="empty-state">Abhi aapka koi entry nahi hai</div>`;
+            document.getElementById('myHistoryList').innerHTML = html;
+        }
+
+        function hideMyHistory() {
+            document.getElementById('myHistoryCard').style.display = 'none';
+            document.getElementById('entryFormCard').style.display = 'block';
+        }
+
+        // ========== ADMIN ==========
+        function renderAdminDashboard() {
+            const dates = Object.keys(allData).sort().reverse();
+
+            let totalCash = 0, totalDC = 0;
+            dates.forEach(d => {
+                if (allData[d]) {
+                    Object.values(allData[d]).forEach(e => {
+                        totalCash += e.cash || 0;
+                        totalDC += e.dc || 0;
+                    });
+                }
+            });
+            document.getElementById('overallCash').textContent = '₹' + totalCash.toLocaleString('en-IN');
+            document.getElementById('overallDC').textContent = '₹' + totalDC.toLocaleString('en-IN');
+            document.getElementById('overallTotal').textContent = '₹' + (totalCash + totalDC).toLocaleString('en-IN');
+            document.getElementById('dateCount').textContent = dates.length;
+
+            const list = document.getElementById('dateList');
+            if (dates.length === 0) {
+                list.innerHTML = `<div class="empty-state">
+                    <div style="font-size:2rem;margin-bottom:8px;">📭</div>
+                    Abhi koi recovery data nahi hai.<br>Employees data bharne ke baad yahan LIVE dikhega.
+                </div>`;
+                return;
+            }
+
+            list.innerHTML = dates.map(date => {
+                let dayCash = 0, dayDC = 0, count = 0;
+                if (allData[date]) {
+                    Object.values(allData[date]).forEach(e => {
+                        dayCash += e.cash || 0;
+                        dayDC += e.dc || 0;
+                        count++;
+                    });
+                }
+                return `
+                    <div class="date-item has-data" onclick="showDateDetail('${date}')">
+                        <div class="date-label">${formatDate(date)} <span style="font-size:0.75rem;color:#888;">(${count} emp)</span></div>
+                        <div class="date-totals">
+                            <span class="total-cash">Cash: ₹${dayCash.toLocaleString('en-IN')}</span>
+                            <span class="total-dc">DC: ₹${dayDC.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function showDateDetail(date) {
+            const dayData = allData[date] || {};
+
+            document.getElementById('dateList').parentElement.style.display = 'none';
+            document.getElementById('overallSummary').style.display = 'none';
+            document.querySelector('.tools-bar').style.display = 'none';
+            document.getElementById('detailView').classList.add('active');
+
+            document.getElementById('detailTitle').textContent = formatDate(date) + ' — Employee Details';
+
+            let dayCash = 0, dayDC = 0;
+            let rows = '';
+
+            EMPLOYEES.forEach(name => {
+                const e = dayData[name] || { cash: 0, dc: 0 };
+                dayCash += e.cash || 0;
+                dayDC += e.dc || 0;
+                const cashClass = (e.cash || 0) > 0 ? 'cash-val' : 'zero';
+                const dcClass = (e.dc || 0) > 0 ? 'dc-val' : 'zero';
+                rows += `
+                    <div class="employee-row">
+                        <div>${name}</div>
+                        <div class="${cashClass}">₹${(e.cash||0).toLocaleString('en-IN')}</div>
+                        <div class="${dcClass}">₹${(e.dc||0).toLocaleString('en-IN')}</div>
+                    </div>`;
+            });
+
+            document.getElementById('detailCash').textContent = '₹' + dayCash.toLocaleString('en-IN');
+            document.getElementById('detailDC').textContent = '₹' + dayDC.toLocaleString('en-IN');
+            document.getElementById('detailTotal').textContent = '₹' + (dayCash + dayDC).toLocaleString('en-IN');
+            document.getElementById('detailRows').innerHTML = rows;
+        }
+
+        function closeDetail() {
+            document.getElementById('detailView').classList.remove('active');
+            document.getElementById('dateList').parentElement.style.display = 'block';
+            document.getElementById('overallSummary').style.display = 'flex';
+            document.querySelector('.tools-bar').style.display = 'flex';
+            renderAdminDashboard();
+        }
+
+        function showAdminMsg(text, type) {
+            const box = document.getElementById('adminMsgBox');
+            if (!box) return;
+            box.innerHTML = `<div class="msg ${type}">${text}</div>`;
+            setTimeout(() => { box.innerHTML = ''; }, 4500);
+        }
+
+        // ========== EXPORT ==========
+        function exportCSV() {
+            if (Object.keys(allData).length === 0) {
+                showAdminMsg('⚠️ Koi data nahi hai export karne ke liye!', 'error');
+                return;
+            }
+
+            let csv = 'DATE';
+            EMPLOYEES.forEach(name => {
+                csv += `,${name} Cash,${name} DC`;
+            });
+            csv += ',TOTAL Cash,TOTAL DC\n';
+
+            const dates = Object.keys(allData).sort();
+            dates.forEach(date => {
+                let rowCash = 0, rowDC = 0;
+                csv += formatDate(date);
+                EMPLOYEES.forEach(name => {
+                    const e = (allData[date] && allData[date][name]) ? allData[date][name] : { cash: 0, dc: 0 };
+                    csv += `,${e.cash || 0},${e.dc || 0}`;
+                    rowCash += e.cash || 0;
+                    rowDC += e.dc || 0;
+                });
+                csv += `,${rowCash},${rowDC}\n`;
+            });
+
+            csv += 'TOTAL';
+            let grandCash = 0, grandDC = 0;
+            EMPLOYEES.forEach(name => {
+                let empCash = 0, empDC = 0;
+                dates.forEach(date => {
+                    if (allData[date] && allData[date][name]) {
+                        empCash += allData[date][name].cash || 0;
+                        empDC += allData[date][name].dc || 0;
+                    }
+                });
+                csv += `,${empCash},${empDC}`;
+                grandCash += empCash;
+                grandDC += empDC;
+            });
+            csv += `,${grandCash},${grandDC}\n`;
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `recovery-sheet-${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        let clearConfirmStep = 0;
+
+        function clearAllData() {
+            clearConfirmStep = 1;
+            document.getElementById('clearConfirmText').textContent = 'Saara data Firebase se delete ho jayega. Sure ho?';
+            document.getElementById('confirmDeleteStepBtn').textContent = '⚠️ Haan, Aage Badhein';
+            document.getElementById('clearConfirmModal').classList.add('active');
+        }
+
+        function proceedClearAllData() {
+            if (clearConfirmStep === 1) {
+                clearConfirmStep = 2;
+                document.getElementById('clearConfirmText').textContent = 'Last chance! Kya aap pakka saara recovery data delete karna chahte hain?';
+                document.getElementById('confirmDeleteStepBtn').textContent = '🗑️ Final Delete All';
+                return;
+            }
+            closeClearConfirmModal();
+            if (!db) {
+                showAdminMsg('❌ Database connected nahi hai.', 'error');
+                return;
+            }
+            db.ref('recovery').remove().then(() => {
+                showAdminMsg('✅ Saara data clear ho gaya.', 'success');
+            }).catch(err => {
+                showAdminMsg('❌ Error: ' + err.message, 'error');
+            });
+        }
+
+        function closeClearConfirmModal() {
+            clearConfirmStep = 0;
+            document.getElementById('clearConfirmModal').classList.remove('active');
+        }
+
+        // ========== PWA / MOBILE HOME SCREEN ENGINE ==========
+        let deferredInstallPrompt = null;
+
+        function generateAppIconDataUrl(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Rounded dark blue background
+            const grad = ctx.createLinearGradient(0, 0, size, size);
+            grad.addColorStop(0, '#0f3460');
+            grad.addColorStop(1, '#1a1a2e');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            const r = size * 0.2;
+            ctx.moveTo(r, 0);
+            ctx.lineTo(size - r, 0);
+            ctx.quadraticCurveTo(size, 0, size, r);
+            ctx.lineTo(size, size - r);
+            ctx.quadraticCurveTo(size, size, size - r, size);
+            ctx.lineTo(r, size);
+            ctx.quadraticCurveTo(0, size, 0, size - r);
+            ctx.lineTo(0, r);
+            ctx.quadraticCurveTo(0, 0, r, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            // Cyan border
+            ctx.strokeStyle = '#00d9ff';
+            ctx.lineWidth = Math.max(4, size * 0.035);
+            ctx.stroke();
+
+            // Rupee symbol
+            ctx.fillStyle = '#00d9ff';
+            ctx.font = `900 ${Math.round(size * 0.34)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('₹', size / 2, size * 0.36);
+
+            // Title text
+            ctx.fillStyle = '#2ed573';
+            ctx.font = `800 ${Math.round(size * 0.14)}px sans-serif`;
+            ctx.fillText('JEN R-II', size / 2, size * 0.65);
+
+            ctx.fillStyle = '#ffa502';
+            ctx.font = `700 ${Math.round(size * 0.095)}px sans-serif`;
+            ctx.fillText('RECOVERY', size / 2, size * 0.82);
+
+            return canvas.toDataURL('image/png');
+        }
+
+        function initPWA() {
+            try {
+                const icon192 = generateAppIconDataUrl(192);
+                const icon512 = generateAppIconDataUrl(512);
+
+                const appleIcon = document.getElementById('pwaAppleIcon');
+                if (appleIcon) appleIcon.href = icon192;
+
+                const startUrl = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
+                    ? window.location.href.split('#')[0]
+                    : './index.html';
+
+                const dynamicManifest = {
+                    name: "JEN R-II Daily Recovery App",
+                    short_name: "JEN R-II",
+                    description: "Multi-User PIN Protected Real-time Daily Recovery App",
+                    start_url: startUrl,
+                    display: "standalone",
+                    orientation: "portrait",
+                    background_color: "#1a1a2e",
+                    theme_color: "#0f3460",
+                    icons: [
+                        { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                        { src: icon512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                    ]
+                };
+
+                const manifestBlobUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dynamicManifest));
+                const manifestLink = document.getElementById('pwaManifestLink');
+                if (manifestLink && !manifestLink.getAttribute('href')) {
+                    manifestLink.setAttribute('href', manifestBlobUrl);
+                }
+
+                // Register Service Worker when on http://localhost or https://
+                if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                    navigator.serviceWorker.register('sw.js').catch(() => {});
+                }
+
+                // Detect standalone mode (already launched from Home Screen)
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+                if (isStandalone) {
+                    const banner = document.getElementById('pwaInstallBanner');
+                    if (banner) banner.style.display = 'none';
+                    const badge = document.getElementById('standaloneBadge');
+                    if (badge) badge.style.display = 'block';
+                }
+            } catch (e) {
+                console.warn('PWA init warning:', e);
+            }
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            const btn = document.getElementById('installAppBtn');
+            const sub = document.getElementById('pwaBannerSubtext');
+            if (btn) btn.textContent = '📲 Install App (1-Click)';
+            if (sub) sub.textContent = 'Ready! Button dabakar sidha mobile Home Screen par install karein';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredInstallPrompt = null;
+            const banner = document.getElementById('pwaInstallBanner');
+            if (banner) banner.style.display = 'none';
+            const badge = document.getElementById('standaloneBadge');
+            if (badge) badge.style.display = 'block';
+        });
+
+        function installPWA() {
+            if (deferredInstallPrompt) {
+                deferredInstallPrompt.prompt();
+                deferredInstallPrompt.userChoice.then(() => {
+                    deferredInstallPrompt = null;
+                });
+            } else {
+                openPwaGuide();
+            }
+        }
+
+        function openPwaGuide() {
+            const msgEl = document.getElementById('pwaModalStatusMsg');
+            if (msgEl) {
+                if (window.location.protocol === 'file:') {
+                    msgEl.innerHTML = '<div class="msg error">⚠️ Abhi aapne yeh file Offline (file://) kholi hai. Chrome Home Screen shortcut ke liye isey HTTP/HTTPS par chalayein.</div>';
+                } else {
+                    msgEl.innerHTML = '<div class="msg info">💡 Chrome ke upar right corner me <b>3 dots (⋮)</b> dabayein aur <b>"Add to Home screen"</b> ya <b>"Install app"</b> chunein!</div>';
+                }
+            }
+            document.getElementById('pwaGuideModal').classList.add('active');
+        }
+
+        function closePwaGuide() {
+            document.getElementById('pwaGuideModal').classList.remove('active');
+        }
+
+        function downloadPwaHelperFiles() {
+            const icon192 = generateAppIconDataUrl(192);
+            const icon512 = generateAppIconDataUrl(512);
+            const manifestObj = {
+                name: "JEN R-II Daily Recovery App",
+                short_name: "JEN R-II",
+                description: "Multi-User PIN Protected Real-time Daily Recovery App",
+                start_url: "./index.html",
+                display: "standalone",
+                orientation: "portrait",
+                background_color: "#1a1a2e",
+                theme_color: "#0f3460",
+                icons: [
+                    { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                    { src: icon512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                ]
+            };
+            const mBlob = new Blob([JSON.stringify(manifestObj, null, 2)], { type: 'application/json' });
+            const mUrl = URL.createObjectURL(mBlob);
+            const a1 = document.createElement('a');
+            a1.href = mUrl;
+            a1.download = 'manifest.json';
+            a1.click();
+            URL.revokeObjectURL(mUrl);
+
+            const swCode = `const CACHE_NAME = 'jen-r2-recovery-v1';
+const ASSETS = ['./', './index.html', './manifest.json'];
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE_NAME).then((c) => c.addAll(ASSETS)).catch(() => {}));
+  self.skipWaiting();
+});
+self.addEventListener('activate', (e) => {
+  e.waitUntil(self.clients.claim());
+});
+self.addEventListener('fetch', (e) => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+});
+`;
+            setTimeout(() => {
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                const a2 = document.createElement('a');
+                a2.href = swUrl;
+                a2.download = 'sw.js';
+                a2.click();
+                URL.revokeObjectURL(swUrl);
+            }, 400);
+        }
+
+        function formatDate(iso) {
+            const d = new Date(iso + 'T00:00:00');
+            return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+    </script>
+</body>
+</html>
